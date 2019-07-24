@@ -1,0 +1,166 @@
+ // bernoulli_logistic transformed data function
+// evidence synthesis in rstan
+
+//https://cran.r-project.org/web/packages/RBesT/vignettes/PoS_codata.html
+data {
+  
+  //##  2 groups  ##
+    int<lower=1> N2;                       // The number of rows of data for aggregated set with 2 probabilities
+    
+    int<lower=0> Na[N2];                   // Total number of mosquitoes entering IRS huts
+    int<lower=0> Xd[N2];                   // Number mosquites dead sprayed hut
+    int<lower=0> Xf[N2];                   // Number mosquites fed sprayed hut
+    
+    vector<lower=0>[N2] time_a;            // time predictor for aggregated set
+    
+    int<lower=1> N_len_a;                  // IRS treatments for aggregated data (this is 10)
+    int<lower=1, upper=N_len_a> len_a[N2]; // Rep for each IRS treatment
+    
+    //##  4 groups  ##
+      int<lower=1> N4;                // The number of rows of data for full set with 4 probabilities
+    
+    int<lower=0> Nb[N4];             // Total number of mosquitoes entering IRS huts
+    int<lower=0> Xdf[N4];             // Number mosquites fed and dead sprayed hut
+    int<lower=0> Xdu[N4];             // Number mosquites unfed and dead sprayed hut
+    int<lower=0> Xsf[N4];             // Number mosquites fed and survived sprayed hut
+    int<lower=0> Xsu[N4];             // Number mosquites unfed and survived sprayed hut
+    
+    int<lower=1> N_bins;              // This is the number of probabilities that should sum to 1
+    
+    vector<lower=0>[N4] time_b;            // time predictor for full set
+    
+    int<lower=1> N_len_b;                  // IRS treatments for full data (this is 3)
+    int<lower=1, upper=N_len_b> len_b[N4]; // Rep for each IRS treatment
+    
+    
+}
+
+parameters {
+  vector[N_bins] mu_beta0;
+  vector[N_bins] tau_beta0;
+  
+  vector[N_bins] mu_beta1;
+  vector[N_bins] tau_beta1;
+ 
+  vector[N_bins] sigma2_beta0;
+  vector[N_bins] logsigma_beta0;
+  vector[N_bins] sigma_beta0;
+  
+  vector[N_bins] sigma2_beta1;
+  vector[N_bins] logsigma_beta1;
+  vector[N_bins] sigma_beta1;
+
+  matrix[N_len_a,N_bins] beta0cN2;
+  matrix[N_len_a,N_bins] beta1cN2;
+
+  matrix[N_len_b,N_bins] beta0cN4;
+  matrix[N_len_b,N_bins] beta1cN4;
+  
+
+
+  real y_tilde[N_len_b,N_bins];
+
+}
+
+model {
+  real sum_p;
+  matrix[N_len_a,N_bins] p;
+  matrix[N_len_a,N_bins - 1] cdf;
+  matrix[N_len_a, N_bins] phi_a;
+  matrix[N_len_b, N_bins] phi_b;
+  matrix[N_len_a, N_bins] prob_a;
+  matrix[N_len_a, N_bins] prob_b;
+  vector[N_len_a] p_dead;
+  vector[N_len_a] p_fed;
+  
+   //## prior distributions
+    
+    for(c in 2:4){
+      
+      mu_beta0[c] ~ normal(0, 1.0E-6);			  
+      logsigma_beta0[c] ~ uniform(-5, 10);		    # log-sd for between trials
+      mu_beta1[c] ~ normal(0, 1.0E-6);			  
+      logsigma_beta1[c] ~ uniform(-5, 10);		    # log-sd for between trials
+    }
+  
+  for (i in 1:N_len_a){
+     for(c in 1:N_bins){
+        
+        beta0cN2[i,c] ~ normal_log(mu_beta0[c], tau_beta0[c]);
+        beta1cN2[i,c] ~ normal_log(mu_beta1[c], exp(logsigma_beta1[c]));
+      }
+  }
+  
+  for (i in 1:N_len_b){
+     for(c in 1:N_bins){
+        
+        beta0cN4[i,c] ~ normal_log(mu_beta0[c], tau_beta0[c]);
+        beta1cN4[i,c] ~ normal_log(mu_beta1[c], exp(logsigma_beta1[c]));
+      }
+  }
+  
+  
+  //## 2 groups ##
+
+  for(j in 1:N_len_a){
+      phi_a[j,1] = 1;
+      
+      for(s in 1:(N_bins - 1))
+        phi_a[j,s] = beta0cN2[len_a[j], s] + beta1cN2[len_a[j], s]*time_a[j];
+      for(s in 1:(N_bins - 1))
+        cdf[j,s] = binomial_cdf(5, N2, phi_a[j,s]);
+      
+        p[j,1] = 1;
+        sum_p = p[j,1];
+        for(s in 2:(N_bins - 1)){
+          p[j,s] = (cdf[j,s] - cdf[j,s - 1]);
+            if(p[j,s]<0) p[j,s] = 0;
+            sum_p = sum_p + p[j,s];
+        }
+        if(sum_p < 1)
+        p[j,N_bins] = 1 - sum_p;
+        else
+        p[j,N_bins] = 0;
+      
+      p_dead[j] = p[j,1] + p[j,2];
+      p_fed[j] = p[j,3] + p[j,4];
+      }
+      Xd ~ multinomial(p_dead);
+      Xf ~ multinomial(p_fed);
+      
+    }
+  
+  //##  4 groups  ##
+
+  for(j in 1:N_len_b){
+      phi_b[j,1] = 1;
+      
+      for(s in 1:(N_bins - 1))
+        phi_b[j,s] = beta0cN4[len_b[j], s] + beta1cN4[len_b[j], s]*time_b[j];
+      for(s in 1:(N_bins - 1))
+        cdf[j,s] = binomial_cdf(5, N4, phi_b[j,s]);
+      
+        p[j,1] = 1;
+        sum_p = p[j,1];
+        for(s in 2:(N_bins - 1)){
+          p[j,s] = (cdf[j,s] - cdf[j,s - 1]);
+            if(p[j,s]<0) p[j,s] = 0;
+            sum_p = sum_p + p[j,s];
+        }
+        if(sum_p < 1)
+        p[j,N_bins] = 1 - sum_p;
+        else
+        p[j,N_bins] = 0;
+      
+      p_dead_fed[j] = p[j,1];
+      p_dead_unfed[j] = p[j,2];
+      p_alive_fed[j] = p[j,3];
+      p_alive_unfed[j] = p[j,4];
+      }
+      Xdf ~ multinomial(p_dead_fed);
+      Xdu ~ multinomial(p_dead_unfed);
+      Xsf ~ multinomial(p_alive_fed);
+      Xsu ~ multinomial(p_alive_unfed); 
+    }
+    
+}

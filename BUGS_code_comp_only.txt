@@ -1,0 +1,77 @@
+## using 4 category data only ('comprehesive model')
+
+model {
+  
+  ## separate binomial models
+  ## for successfully fed and dead
+  
+  for(j in 1:len_b){
+      
+      X_sf[j] ~ dbin(prob_sf[j], Nb[j])
+      logit(prob_sf[j]) <- beta0[studyid_b[j]] + beta1[studyid_b[j]]*time_b[j]
+      
+      X_d[j] ~ dbin(prob_d[j], Nb[j])
+      logit(prob_d[j]) <- beta0d[studyid_b[j]] + beta1d[studyid_b[j]]*time_b[j]
+    }
+
+  ## global level
+  
+  for (i in 1:N_studies_b){
+  
+    beta0[i] ~ dnorm(mu_beta0, tau_beta0)
+    beta1[i] ~ dnorm(mu_beta1, tau_beta1)
+    
+    beta0d[i] ~ dnorm(mu_beta0d, tau_beta0d)
+    beta1d[i] ~ dnorm(mu_beta1d, tau_beta1d)
+  }
+  
+  ## node transformations
+
+  tau_beta1 <- 1/sigma2_beta1					# precision for between trials
+  sigma_beta1 <- exp(logsigma_beta1)	# sd for between trials
+  sigma2_beta1 <- pow(sigma_beta1, 2)	# variance for between trials
+
+  tau_beta0 <- 1/sigma2_beta0					# precision for between trials
+  sigma_beta0 <- exp(logsigma_beta0)	# sd for between trials
+  sigma2_beta0 <- pow(sigma_beta0, 2)	# variance for between trials
+
+  tau_beta1d <- 1/sigma2_beta1d					# precision for between trials
+  sigma_beta1d <- exp(logsigma_beta1d)	# sd for between trials
+  sigma2_beta1d <- pow(sigma_beta1d, 2)	# variance for between trials
+
+  tau_beta0d <- 1/sigma2_beta0d					# precision for between trials
+  sigma_beta0d <- exp(logsigma_beta0d)	# sd for between trials
+  sigma2_beta0d <- pow(sigma_beta0d, 2)	# variance for between trials
+  
+  ## prior distributions
+  
+  mu_beta0 ~ dnorm(0, 1.0E-6)			  
+  logsigma_beta0 ~ dunif(-5, 10)		    # log-sd for between trials
+  mu_beta1 ~ dnorm(0, 1.0E-6)			  
+  logsigma_beta1 ~ dunif(-5, 10)		    # log-sd for between trials
+
+  mu_beta0d ~ dnorm(0, 1.0E-6)			  
+  logsigma_beta0d ~ dunif(-5, 10)		    # log-sd for between trials
+  mu_beta1d ~ dnorm(0, 1.0E-6)			  
+  logsigma_beta1d ~ dunif(-5, 10)		    # log-sd for between trials
+  
+  #for (t in 1:365) {
+  for (t in 1:12) {
+  
+    ## posterior predictions
+
+    logit(pred_sf[t]) <- mu_beta0 + mu_beta1*t
+    logit(pred_d[t]) <- mu_beta0d + mu_beta1d*t
+
+    for (j in 1:N_studies_b) {
+    
+        logit(predj_sf[j,t]) <- beta0[j] + beta1[j]*t
+        logit(predj_d[j,t]) <- beta0d[j] + beta1d[j]*t
+    }
+
+    ## Bayesian p-value
+    #c1.ppost[j] <- step(c1.rep[j] - c1[j])
+  }
+  
+}
+

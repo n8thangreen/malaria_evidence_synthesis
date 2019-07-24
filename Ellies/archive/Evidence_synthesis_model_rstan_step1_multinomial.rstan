@@ -1,0 +1,74 @@
+// bernoulli_logistic transformed data function
+// evidence synthesis in rstan
+
+//https://cran.r-project.org/web/packages/RBesT/vignettes/PoS_codata.html
+//https://discourse.mc-stan.org/t/speeding-up-a-hierarchical-multinomial-logit-model/1538/4
+
+functions{
+  int robust_bernoulli_rng(real p) {
+    if (p == 0)
+      return 0;
+    else if (p == 1)
+      return 1;
+    else
+      return bernoulli_rng(p);
+  }
+}
+
+data {
+    int<lower=1> N_len_b;                       // The number of studies (random effect)
+    int<lower=1> N_bins;                        // This is the number of probabilities that should sum to 1 (dead_alive_fed_unfed)
+    int<lower=1> N_max_time_reps;               // This is the maximum number of time reps for a given study 
+                                                // (need to add in -1 matrices if studies have different numbers of time steps)
+    int<lower=1> Nb[N_max_time_reps,N_len_b];       // Total number of mosquitoes entering experimental huts
+    int<lower=1> time_b[N_max_time_reps,N_len_b];   // time predictor covariate 
+    
+    int<lower=1> len_b[N_max_time_reps,N_bins,N_len_b]; // Rep for each IRS treatment
+}
+
+parameters {
+
+  matrix[2,N_bins] beta;
+  vector[N_bins] sigma_study;
+
+}
+
+model {
+  matrix[N_max_time_reps,N_bins] z;
+  matrix[N_max_time_reps,N_bins] expz;
+  matrix[N_max_time_reps,N_bins] p;
+  
+  //priors
+  for(k in 2:N_bins){
+    //priors for model coefficient (time)
+    for(j in 1:2){
+      beta[j,k] ~ normal(0, 1.0E-6);
+      }
+    //hyper priors for the different study groups
+    sigma_study[k] ~ normal(0,1);
+    sigma_study[1] ~ normal(1,0.00001);
+    }
+  //random effect of study
+  for(i in 1:N_max_time_reps){
+    for(k in 2:N_bins){
+      for(s in 1:N_len_b){
+        len_b[i,k,s] ~ normal(0,1);
+      }
+    }
+  }
+  
+  //likelihood
+  for(s in 1:N_len_b){
+    for(i in 1:N_max_time_reps){
+      for(k in 1:N_bins){
+        //linear predictors
+        z[i,k] = beta[1,k] + beta[2,k]*time_b[i,s] + len_b[i,k,s]*sigma_study[k];
+        expz[i,k] = exp(z[i,k]);
+        p[i,k] = expz[i,k]/sum(expz[i,1:N_bins]);
+      
+    len_b[i,k,s] ~ multinomial(p[i,1]);
+    
+      }
+    }
+  }
+}

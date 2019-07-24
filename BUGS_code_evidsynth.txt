@@ -1,0 +1,121 @@
+## full evidence synthesis model
+
+#https://stackoverflow.com/questions/48776303/how-to-obtain-multinomial-probabilities-in-winbugs-with-multiple-regression
+
+#https://books.google.co.uk/books?id=rvOcBAAAQBAJ&pg=PA225&lpg=PA225&dq=hierarchical+multinomial+bugs&source=bl&ots=rv45Yehc7_&sig=ACfU3U3AztAopHFkb9FoutUePRCWnYCSpg&hl=en&sa=X&ved=2ahUKEwiDk_SxzbjhAhXcSxUIHRtUAAs4ChDoATABegQICBAB#v=onepage&q=hierarchical%20multinomial%20bugs&f=false
+
+model {
+  
+  ## 2 groups ##
+  ## binomial models
+  
+  for(j in 1:len_a){
+      
+      Xd[j] ~ dbin(prob_a[j, 2] + prob_a[j, 4], Na[j])
+      Xf[j] ~ dbin(prob_a[j, 1] + prob_a[j, 2], Na[j])
+      
+      phi_a[j,1] <- 1
+      prob_a[j,1] <- 1/sum(phi_a[j, 1:4])
+      
+      for(c in 2:4){
+      
+        log(phi_a[j,c]) <- beta0c[1, studyid_a[j], c] + beta1c[1, studyid_a[j], c]*time_a[j]
+        prob_a[j,c] <- phi_a[j,c]/sum(phi_a[j, 1:4])
+      }
+    }
+
+  ## 4 groups ##
+  ## multinomial model
+  
+  for(j in 1:len_b){
+      
+      X_b[j, 1:4] ~ dmulti(prob_b[j, 1:4], Nb[j])
+      
+      phi_b[j,1] <- 1
+      prob_b[j,1] <- 1/sum(phi_b[j, 1:4])
+      
+      for(c in 2:4){
+      
+        log(phi_b[j,c]) <- beta0c[2, studyid_b[j], c] + beta1c[2, studyid_b[j], c]*time_b[j]
+        prob_b[j,c] <- phi_b[j,c]/sum(phi_b[j, 1:4])
+      }
+    }
+  
+  ## global level
+  
+  for (i in 1:N_studies_a){
+  
+    #set reference category to zero
+    beta0c[1,i,1] <- 0
+    beta1c[1,i,1] <- 0
+      
+    for(c in 2:4){
+      
+      beta0c[1,i,c] ~ dnorm(mu_beta0[c], tau_beta0[c])
+      beta1c[1,i,c] ~ dnorm(mu_beta1[c], tau_beta1[c])
+    }
+  }
+  
+  for (i in 1:N_studies_b){
+  
+    #set reference category to zero
+    beta0c[2,i,1] <- 0
+    beta1c[2,i,1] <- 0
+      
+    for(c in 2:4){
+      
+      beta0c[2,i,c] ~ dnorm(mu_beta0[c], tau_beta0[c])
+      beta1c[2,i,c] ~ dnorm(mu_beta1[c], tau_beta1[c])
+    }
+  }
+
+  ## node transformations
+
+  for(c in 2:4){
+    
+    tau_beta1[c] <- 1/sigma2_beta1[c]					# precision for between trials
+    sigma_beta1[c] <- exp(logsigma_beta1[c])	# sd for between trials
+    sigma2_beta1[c] <- pow(sigma_beta1[c], 2)	# variance for between trials
+  
+    tau_beta0[c] <- 1/sigma2_beta0[c]					# precision for between trials
+    sigma_beta0[c] <- exp(logsigma_beta0[c])	# sd for between trials
+    sigma2_beta0[c] <- pow(sigma_beta0[c], 2)	# variance for between trials
+  }
+  
+  ## prior distributions
+  
+  for(c in 2:4){
+  
+    mu_beta0[c] ~ dnorm(0, 1.0E-6)			  
+    logsigma_beta0[c] ~ dunif(-5, 10)		    # log-sd for between trials
+    mu_beta1[c] ~ dnorm(0, 1.0E-6)			  
+    logsigma_beta1[c] ~ dunif(-5, 10)		    # log-sd for between trials
+  }
+  
+  #for (t in 1:365) {
+  for (t in 1:12) {
+  
+    ## posterior predictions
+
+    phi_pred[t,1] <- 1
+    prob_pred[t,1] <- 1/sum(phi_pred[t, 1:4])
+    
+    for(c in 2:4){
+    
+      log(phi_pred[t,c]) <- mu_beta0[c] + mu_beta1[c]*t
+      prob_pred[t,c] <- phi_pred[t,c]/sum(phi_pred[t, 1:4])
+    }
+    
+    pred_d[t] <- prob_pred[t,2] + prob_pred[t,4]
+    pred_f[t] <- prob_pred[t,1] + prob_pred[t,2]
+    pred_sf[t] <- prob_pred[t,1]
+    
+    # (df/dn) / (sf/sn)
+    OR[t] <- (prob_pred[t,2]/prob_pred[t,4])/(prob_pred[t,1]/prob_pred[t,3])
+    
+    ## Bayesian p-value
+    #c1.ppost[j] <- step(c1.rep[j] - c1[j])
+  }
+  
+}
+
