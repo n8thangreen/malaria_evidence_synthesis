@@ -16,13 +16,13 @@ library(R2WinBUGS)
 library(purrr)
 
 # readin data
-data_b <- read.csv(here::here("code", "data input", "N4_data.csv"), header = TRUE)
+data_b <- read.csv(here::here("data input", "N4_data.csv"), header = TRUE)
 
 # create input data
 jags_dat_input <- 
   list(
-    len_b = nrow(data_b), #number of data points of type b
-    Nb = data_b$N_total,  #total number of mosquitos in each trial type b
+    len_b = nrow(data_b),                   # number of data points of type b
+    Nb = data_b$N_total,                    # total number of mosquitos in each trial type b
     time_b = data_b$months_since_IRS,
     N_studies_b = length(unique(data_b$study_id)),
     studyid_b = data_b$study_id,
@@ -59,13 +59,13 @@ n_thin <- 10
 out <- jags(jags_dat_input,
             # inits = list(inits(), inits()),
             parameters.to.save = params,
-            model.file = here::here("code", "BUGS_code_comp_only.txt"),
+            model.file = here::here("BUGS_code_comp_only.txt"),
             n.chains = 2,
             n.iter = n_iter,
             n.burnin = n_burnin,
             n.thin = n_thin,
             DIC = TRUE,
-            working.directory = here::here("code"),
+            working.directory = here::here(),
             progress.bar = "text")
 
 BUGSoutput <- out$BUGSoutput
