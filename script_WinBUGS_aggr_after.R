@@ -16,7 +16,7 @@ library(R2WinBUGS)
 library(purrr)
 
 # readin data
-data_a <- read.csv(here::here("code", "data input", "N2_data.csv"), header = TRUE)
+data_a <- read.csv(here::here("data input", "N2_data.csv"), header = TRUE)
 
 # create input data
 jags_dat_input <- 

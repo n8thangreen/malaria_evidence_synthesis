@@ -47,9 +47,6 @@ transformed parameters {
 model {
 
 
-# do vector of X then sum log likelihoods?
-# target +=
-
   //priors
   
   for (c in 1:4){
@@ -71,7 +68,8 @@ model {
   
   for (j in 1:len_b){
     for (c in 1:4){
-      XB[j,c] = X_b[j,c] * beta1c2[studyid_b[j], c];
+      // this wrong...
+      prob_b[j,c] = inv_logit(beta0c2[studyid_b[j], c] + time_b[j] * beta1c2[studyid_b[j], c]);
     }
   }
   
@@ -79,34 +77,14 @@ model {
   
   for (j in 1:len_b){
     
-    // multinomial_lpmf(X_b[j, ], prob_b[j, ]);
-    
-    prob_b[j, ] ~ categorical_logit(XB[j, ]);
+    target += multinomial_lpmf(X_b[j, ] | prob_b[j, ]);
     
   }
 
-  ## watch out for real-integer coercion!
-  
-  for (i in 1:N_studies_b){
-  
-    //set reference category to zero
-    beta0c2[i,1] = 0;
-    beta1c2[i,1] = 0;
-  }
-
-  for(j in 1:len_b){
-  
-    phi_b[j,1] = 1;
-    prob_b[j,1] = 1/sum(phi_b[j, 1:4]);
-    
-    for(c in 2:4){
-      
-      phi_b[j, c] = exp(beta0c2[studyid_b[j], c] + beta1c2[studyid_b[j], c]*time_b[j]);
-      prob_b[j, c] = phi_b[j,c]/sum(phi_b[j, 1:4]);
-    }
-  }
 }
 
 generated quantities {
 
 }
+
+

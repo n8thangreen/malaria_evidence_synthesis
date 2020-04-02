@@ -15,8 +15,8 @@ library(R2jags)
 library(R2WinBUGS)
 library(purrr)
 
-data_a <- read.csv(here::here("code", "data input", "N2_data.csv"), header = TRUE)
-data_b <- read.csv(here::here("code", "data input", "N4_data.csv"), header = TRUE)
+data_a <- read.csv(here::here("data input", "N2_data.csv"), header = TRUE)
+data_b <- read.csv(here::here("data input", "N4_data.csv"), header = TRUE)
 
 jags_dat_input <- 
   list(

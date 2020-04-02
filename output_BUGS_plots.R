@@ -15,7 +15,6 @@
 # launch_shinystan(yy)
 
 
-# load packages
 library(adegenet)
 library(shinystan)
 library(coda)
