@@ -22,7 +22,7 @@ jags_dat_input <-
   list(
     # a
     len_a = nrow(data_a), #number of data points of type a
-    Na = data_a$N_total,  #total number of mosquitos in each trial type a
+    Na = data_a$N_total,  #total number of mosquitoes in each trial type a
     Xd = data_a$N_dead,
     Xf = data_a$N_fed,
     time_a = data_a$months_since_IRS,
@@ -30,7 +30,7 @@ jags_dat_input <-
     studyid_a = data_a$study_id,
     # b
     len_b = nrow(data_b), #number of data points of type b
-    Nb = data_b$N_total,  #total number of mosquitos in each trial type b
+    Nb = data_b$N_total,  #total number of mosquitoes in each trial type b
     time_b = data_b$months_since_IRS,
     N_studies_b = length(unique(data_b$study_id)),
     studyid_b = data_b$study_id,
@@ -40,7 +40,6 @@ jags_dat_input <-
                      N_survived_unfed = Nsn + Nsne,
                      N_dead_unfed = Ndn + Ndne))
   )
-
 
 params <-
   c("mu_beta0", "sigma_beta0",
@@ -54,16 +53,6 @@ params <-
     # "thresh"
   )
 
-# inits <- function(){
-#   list(
-#     mu_beta0d = ,
-#     logsigma_beta0d = ,
-#     mu_beta1d = ,
-#     logsigma_beta1d =
-#   )
-# }
-
-
 #test
 n_iter <- 10000
 n_burnin <- 100
@@ -73,27 +62,29 @@ n_thin <- 10
 # n_burnin <- 1e3
 # n_thin <- 1e2 #floor((n_iter - n_burnin)/500)
 
-
 ##############
 ## run MCMC ##
 ##############
 
 out <- jags(jags_dat_input,
-            # inits = list(inits(), inits()),
             parameters.to.save = params,
-            model.file = here::here("code", "BUGS_code_evidsynth.txt"),
+            model.file = here::here("BUGS_code_evidsynth.txt"),
             n.chains = 2,
             n.iter = n_iter,
             n.burnin = n_burnin,
             n.thin = n_thin,
             DIC = TRUE,
-            working.directory = here::here("code"),
+            working.directory = here::here(),
             progress.bar = "text")
 
 BUGSoutput <- out$BUGSoutput
 
 folder_nm <- "BUGSoutput_evidsynth"
+
 dir.create(here::here("code", "data output", folder_nm), showWarnings = FALSE)
 
-save(BUGSoutput, file = here::here("code", "data output", folder_nm, "BUGSoutput.RData"))
-save(jags_dat_input, file = here::here("code", "data output", folder_nm, "jags_dat_input.RData"))
+save(BUGSoutput,
+     file = here::here("data output", folder_nm, "BUGSoutput.RData"))
+
+save(jags_dat_input,
+     file = here::here("data output", folder_nm, "jags_dat_input.RData"))

@@ -1,8 +1,20 @@
 
-# posterior time series
-# pair of plots for proportion killed
-# and proportion successfully fed
-
+#' IRS_BUGS_plot
+#'
+#' posterior time series
+#' pair of plots for proportion killed
+#' and proportion successfully fed
+#' 
+#' @param BUGSoutput 
+#' @param jags_dat_input 
+#' @param save 
+#' @param file
+#' 
+#' @importFrom epicontacts, adegenet
+#'
+#' @return
+#' @export
+#'
 IRS_BUGS_plot <- function(BUGSoutput,
                           jags_dat_input,
                           save = TRUE,

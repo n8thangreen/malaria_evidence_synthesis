@@ -9,7 +9,7 @@
 #'     keep_md: TRUE
 #' ---
 
-
+## to view in shinystan
 # xx <- coda::as.mcmc.list(BUGSoutput)
 # yy <- as.shinystan(xx)
 # launch_shinystan(yy)
