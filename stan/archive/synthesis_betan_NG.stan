@@ -1,5 +1,5 @@
 data {
-  int<lower=1> N_groups; // Number of reponse categories
+  int<lower=1> N_reponse; // Number of reponse categories
   
   // Number of experiments with aggregated responses
   int<lower=1> N_agg_exp;
@@ -18,48 +18,40 @@ data {
   // Number of experiments with individual responses
   int<lower=1> N_indiv_exp;
   // Counts of each response
-  int<lower=0> N_responses_indiv[N_indiv_exp, N_groups];
-  
+  int<lower=1> N_responses_indiv[N_indiv_exp, N_reponse];
+
   int<lower=1, upper=N_studies> study_idx_indiv[N_indiv_exp]; // Study index
-  
+
   real time_indiv[N_indiv_exp]; // Time of what?  In what units?
 }
 
 parameters {
   real mu_alpha;           // Intercept population location
   real<lower=0> tau_alpha; // Intercept population scale
-  
-  real alpha_tilde[N_studies, N_groups - 1]; // Noncentered intercepts
+
+  real alpha_tilde[study_idx, N_groups - 1]; // Noncentered intercepts
   
   //changed?
   real mu_beta;           // Slope population location
-  real<lower=0> tau_beta; // Slope population scale
+  real<lower=0> tau_beta // Slope population scale
   
-  real beta_tilde[N_studies, N_groups - 1]; // Noncentered slopes
+  real beta_tilde[study_id, N_groups - 1]; // Noncentered slopes
 }
 
 model {
   // priors
   mu_alpha ~ normal(0, 2);
   tau_alpha ~ normal(0, 2);
-  //to_vector(alpha_tilde) ~ normal(0, 1); //this should be a better for()
-  for (n in 1:N_studies)
-  alpha_tilde[n] ~ normal(0, 1);
+  alpha_tilde ~ normal(0, 1);
   
   mu_beta ~ normal(0, 0.4);
   tau_beta ~ normal(0, 0.4);
-  
-  for (n in 1:N_studies)
-  beta_tilde[n] ~ normal(0, 1);
-  
+  beta_tilde ~ normal(0, 1);
+
   // aggregate
   for (n in 1:N_agg_exp) {
-    
-    //real eta[N_groups]; // Latent effect for each response
-    vector[N_groups] eta; // Latent effect for each response
-    
-    //real p[N_groups];   // Response probabilities
-    vector[N_groups] p;   // Response probabilities
+    real eta[N_groups]; // Latent effect for each response
+    real p[N_groups];   // Response probabilities
     
     eta[1] = 0;
     for (g in 2:N_groups) {
@@ -76,12 +68,8 @@ model {
   
   // individual
   for (n in 1:N_indiv_exp) {
-    
-    //real eta[N_groups]; // Latent effect for each response
-    vector[N_groups] eta; // Latent effect for each response
-    
-    //real p[N_groups];   // Response probabilities
-    vector[N_groups] p;   // Response probabilities
+    real eta[N_groups];
+    real p[N_groups];
     
     eta[1] = 0;
     for (g in 2:N_groups) {
@@ -91,30 +79,6 @@ model {
     }
     
     p = softmax(eta);
-    
     N_responses_indiv[n] ~ multinomial(p);
   }
-}
-
-generated quantities {
-  
-  matrix[N_groups, 12] p_pred;   // Response probabilities
-  
-  for (n in 1:12) {
-    vector[N_groups] eta; // Latent effect for each response
-    
-    eta[1] = 0;
-    for (g in 2:N_groups) {
-
-//TODO: how to ditinguish between groups?
-// when alpha_tilde is in terms of specific observed trials
-
-      //   real alpha = mu_alpha + tau_alpha * alpha_tilde[n, g - 1];
-      // real beta = mu_beta + tau_beta * beta_tilde[n, g - 1];
-      // eta[g] = alpha + beta * n;
-    }
-    
-    p_pred[, n] = softmax(eta);
-  }
-  
 }
