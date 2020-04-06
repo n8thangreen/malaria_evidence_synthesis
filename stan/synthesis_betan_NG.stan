@@ -26,13 +26,12 @@ data {
 }
 
 parameters {
-  real mu_alpha;           // Intercept population location
+  real mu_alpha[N_groups];           // Intercept population location
   real<lower=0> tau_alpha; // Intercept population scale
   
   real alpha_tilde[N_studies, N_groups - 1]; // Noncentered intercepts
   
-  //changed?
-  real mu_beta;           // Slope population location
+  real mu_beta[N_groups];           // Slope population location
   real<lower=0> tau_beta; // Slope population scale
   
   real beta_tilde[N_studies, N_groups - 1]; // Noncentered slopes
@@ -40,17 +39,21 @@ parameters {
 
 model {
   // priors
-  mu_alpha ~ normal(0, 2);
+  //for (i in 1:N_groups)
+    mu_alpha ~ normal(0, 2);
+  
   tau_alpha ~ normal(0, 2);
   //to_vector(alpha_tilde) ~ normal(0, 1); //this should be a better for()
   for (n in 1:N_studies)
-  alpha_tilde[n] ~ normal(0, 1);
+    alpha_tilde[n] ~ normal(0, 1);
+
+  //for (i in 1:(N_groups - 1))  
+    mu_beta ~ normal(0, 0.4);
   
-  mu_beta ~ normal(0, 0.4);
   tau_beta ~ normal(0, 0.4);
   
   for (n in 1:N_studies)
-  beta_tilde[n] ~ normal(0, 1);
+    beta_tilde[n] ~ normal(0, 1);
   
   // aggregate
   for (n in 1:N_agg_exp) {
@@ -63,8 +66,9 @@ model {
     
     eta[1] = 0;
     for (g in 2:N_groups) {
-      real alpha = mu_alpha + tau_alpha * alpha_tilde[study_idx_agg[n], g - 1];
-      real beta = mu_beta + tau_beta * beta_tilde[study_idx_agg[n], g - 1];
+      
+      real alpha = mu_alpha[g] + tau_alpha * alpha_tilde[study_idx_agg[n], g - 1];
+      real beta = mu_beta[g] + tau_beta * beta_tilde[study_idx_agg[n], g - 1];
       eta[g] = alpha + beta * time_agg[n];
     }
     
@@ -85,8 +89,8 @@ model {
     
     eta[1] = 0;
     for (g in 2:N_groups) {
-      real alpha = mu_alpha + tau_alpha * alpha_tilde[study_idx_indiv[n], g - 1];
-      real beta = mu_beta + tau_beta * beta_tilde[study_idx_indiv[n], g - 1];
+      real alpha = mu_alpha[g] + tau_alpha * alpha_tilde[study_idx_indiv[n], g - 1];
+      real beta = mu_beta[g] + tau_beta * beta_tilde[study_idx_indiv[n], g - 1];
       eta[g] = alpha + beta * time_indiv[n];
     }
     
@@ -98,23 +102,19 @@ model {
 
 generated quantities {
   
-  matrix[N_groups, 12] p_pred;   // Response probabilities
+  matrix[N_groups, 12] p_pred;
   
   for (n in 1:12) {
-    vector[N_groups] eta; // Latent effect for each response
+    vector[N_groups] eta;
     
     eta[1] = 0;
     for (g in 2:N_groups) {
 
-//TODO: how to ditinguish between groups?
-// when alpha_tilde is in terms of specific observed trials
-
-      //   real alpha = mu_alpha + tau_alpha * alpha_tilde[n, g - 1];
-      // real beta = mu_beta + tau_beta * beta_tilde[n, g - 1];
-      // eta[g] = alpha + beta * n;
+      eta[g] = mu_alpha[g] + mu_beta[g] * n;
     }
     
     p_pred[, n] = softmax(eta);
   }
   
 }
+

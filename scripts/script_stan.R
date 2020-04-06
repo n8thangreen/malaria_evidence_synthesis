@@ -17,8 +17,8 @@ data_list <-
        
        # aggregate
        N_agg_exp = nrow(Na_data),
-       k1_agg = Na_data$N_dead,
-       k2_agg = Na_data$N_fed,
+       k1_agg = Na_data$N_dead,                   # dead 
+       k2_agg = Na_data$N_fed,                    # fed
        N_trials_agg = Na_data$N_total,
        time_agg = Na_data$months_since_IRS,
        study_idx_agg = Na_data$study_id,
@@ -46,6 +46,8 @@ options(mc.cores = parallel::detectCores())
 
 n_iter <- 200#000
 n_warmup <- 100#000
+
+## run model
 
 stan_base <- stan(
   file = here::here("stan", "synthesis_betan_NG.stan"),
