@@ -1,8 +1,8 @@
 ## full evidence synthesis model
 
-#https://stackoverflow.com/questions/48776303/how-to-obtain-multinomial-probabilities-in-winbugs-with-multiple-regression
-
-#https://books.google.co.uk/books?id=rvOcBAAAQBAJ&pg=PA225&lpg=PA225&dq=hierarchical+multinomial+bugs&source=bl&ots=rv45Yehc7_&sig=ACfU3U3AztAopHFkb9FoutUePRCWnYCSpg&hl=en&sa=X&ved=2ahUKEwiDk_SxzbjhAhXcSxUIHRtUAAs4ChDoATABegQICBAB#v=onepage&q=hierarchical%20multinomial%20bugs&f=false
+# useful resources:
+#  https://stackoverflow.com/questions/48776303/how-to-obtain-multinomial-probabilities-in-winbugs-with-multiple-regression
+#  https://books.google.co.uk/books?id=rvOcBAAAQBAJ&pg=PA225&lpg=PA225&dq=hierarchical+multinomial+bugs&source=bl&ots=rv45Yehc7_&sig=ACfU3U3AztAopHFkb9FoutUePRCWnYCSpg&hl=en&sa=X&ved=2ahUKEwiDk_SxzbjhAhXcSxUIHRtUAAs4ChDoATABegQICBAB#v=onepage&q=hierarchical%20multinomial%20bugs&f=false
 
 model {
   
@@ -86,10 +86,17 @@ model {
   
   for(c in 2:4){
   
-    mu_beta0[c] ~ dnorm(0, 1.0E-6)			  
+    mu_beta0[c] ~ dnorm(0, 1.0E-6)
+    #mu_beta0[c] ~ dnorm(0, 0.5)  # informative prior used in stan code
+
     logsigma_beta0[c] ~ dunif(-5, 10)		    # log-sd for between trials
+    #sigma2_beta0[c] ~ dnorm(0, 0.5)
+
     mu_beta1[c] ~ dnorm(0, 1.0E-6)			  
+    #mu_beta1[c] ~ dnorm(0, 2.5)  # informative prior used in stan code
+
     logsigma_beta1[c] ~ dunif(-5, 10)		    # log-sd for between trials
+	#sigma2_beta1[c] ~ dnorm(0, 2.5)
   }
   
   #for (t in 1:365) {
@@ -116,6 +123,5 @@ model {
     ## Bayesian p-value
     #c1.ppost[j] <- step(c1.rep[j] - c1[j])
   }
-  
 }
 

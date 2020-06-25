@@ -1,38 +1,32 @@
 data {
   int<lower=1> N_groups; // Number of reponse categories
   
-  // Number of experiments with aggregated responses
-  int<lower=1> N_agg_exp;
-  // Number of successes in first aggregation pattern
-  int<lower=0> k1_agg[N_agg_exp]; 
-  // Number of successes in second aggregation pattern
-  int<lower=0> k2_agg[N_agg_exp];
-  // Number of trials
-  int<lower=1> N_trials_agg[N_agg_exp];
+  int<lower=1> N_agg_exp;           // Number of experiments with aggregated responses
+  int<lower=0> k1_agg[N_agg_exp];   // Number of successes in first aggregation pattern
+  int<lower=0> k2_agg[N_agg_exp];   // Number of successes in second aggregation pattern
+  int<lower=1> N_trials_agg[N_agg_exp]; // Number of trials
   
   int<lower=1> N_studies;
   int<lower=1, upper=N_studies> study_idx_agg[N_agg_exp]; // Study index
   
-  real time_agg[N_agg_exp]; // Time of what?  In what units?
+  real time_agg[N_agg_exp];
   
-  // Number of experiments with individual responses
-  int<lower=1> N_indiv_exp;
-  // Counts of each response
-  int<lower=0> N_responses_indiv[N_indiv_exp, N_groups];
+  int<lower=1> N_indiv_exp;   // Number of experiments with individual responses
+  int<lower=0> N_responses_indiv[N_indiv_exp, N_groups]; // Counts of each response
   
   int<lower=1, upper=N_studies> study_idx_indiv[N_indiv_exp]; // Study index
   
-  real time_indiv[N_indiv_exp]; // Time of what?  In what units?
+  real time_indiv[N_indiv_exp];
 }
 
 parameters {
   real mu_alpha[N_groups];           // Intercept population location
-  real<lower=0> tau_alpha; // Intercept population scale
+  real<lower=0> tau_alpha;           // Intercept population scale
   
   real alpha_tilde[N_studies, N_groups - 1]; // Noncentered intercepts
   
   real mu_beta[N_groups];           // Slope population location
-  real<lower=0> tau_beta; // Slope population scale
+  real<lower=0> tau_beta;           // Slope population scale
   
   real beta_tilde[N_studies, N_groups - 1]; // Noncentered slopes
 }
@@ -59,10 +53,10 @@ model {
   for (n in 1:N_agg_exp) {
     
     //real eta[N_groups]; // Latent effect for each response
-    vector[N_groups] eta; // Latent effect for each response
+    vector[N_groups] eta;
     
     //real p[N_groups];   // Response probabilities
-    vector[N_groups] p;   // Response probabilities
+    vector[N_groups] p;
     
     eta[1] = 0;
     for (g in 2:N_groups) {
@@ -82,10 +76,10 @@ model {
   for (n in 1:N_indiv_exp) {
     
     //real eta[N_groups]; // Latent effect for each response
-    vector[N_groups] eta; // Latent effect for each response
+    vector[N_groups] eta;
     
     //real p[N_groups];   // Response probabilities
-    vector[N_groups] p;   // Response probabilities
+    vector[N_groups] p;
     
     eta[1] = 0;
     for (g in 2:N_groups) {
