@@ -1,4 +1,3 @@
-
 #' ---
 #' title: "Evidence synthesis IRS model: plots"
 #'
@@ -45,3 +44,4 @@ load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 load(here::here("data output", folder_nm, "jags_dat_input.RData"))
 
 IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/evidsynth")
+

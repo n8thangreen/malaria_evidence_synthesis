@@ -51,22 +51,26 @@ IRS_BUGS_plot <- function(BUGSoutput,
   par(mfrow = c(1,2))
   
   plot(NULL, ylim = c(0,1), xlim = c(1,tmax),
-       xlab = "Time in months", ylab = "Proportion of mosquitoes killed", main = "", las = 1, xaxt = 'n')
+       xlab = "Time in months",
+       ylab = "Proportion of mosquitoes killed",
+       main = "",
+       las = 1,
+       xaxt = 'n')
   axis(1, at = seq(1, tmax, by = 1))
   
   # medians
-  lines(summary_d[,"50%"], type = "l", col = "darkgrey", lwd = 2)
+  lines(summary_d[, "50%"], type = "l", col = "darkgrey", lwd = 2)
   
   for (i in seq_len(N_studies)) {
-    lines(summary_jd[[i]][,"50%"], type = "l", col = "darkgrey")
+    lines(summary_jd[[i]][, "50%"], type = "l", col = "darkgrey")
     # text(x = 12, y = summary_jd[[i]][,"50%"][12], labels = i)
   }
   
   # uncertainty ribbons
   polygon(x = c(1:tmax, tmax:1),
-          y = c(summary_d[,"25%"],
-                rev(summary_d[,"75%"])),
-          col = transp("blue",0.2), border = FALSE)
+          y = c(summary_d[, "25%"],
+                rev(summary_d[, "75%"])),
+          col = transp("blue", 0.2), border = FALSE)
   polygon(x = c(1:tmax, tmax:1),
           y = c(summary_d[,"2.5%"],
                 rev(summary_d[,"97.5%"])),
@@ -76,9 +80,13 @@ IRS_BUGS_plot <- function(BUGSoutput,
   try(points(jags_dat_input$time_b, jags_dat_input$X_d/jags_dat_input$Nb,
          pch = jags_dat_input$studyid_b), silent = TRUE)
   
-  
-  plot(NULL, ylim = c(0,1), xlim = c(1,tmax),
-       xlab = "Time in months", ylab = "Proportion of mosquitoes successfully fed", main = "", las = 1, xaxt = 'n')
+  plot(NULL,
+       ylim = c(0,1), xlim = c(1,tmax),
+       xlab = "Time in months",
+       ylab = "Proportion of mosquitoes successfully fed",
+       main = "",
+       las = 1,
+       xaxt = 'n')
   axis(1, at = seq(1, tmax, by = 1))
   
   # mdeians
@@ -99,8 +107,10 @@ IRS_BUGS_plot <- function(BUGSoutput,
           col = transp("orange",0.2), border = FALSE)
   
   # raw data
-  try(points(jags_dat_input$time_b, jags_dat_input$X_sf/jags_dat_input$Nb,
-         pch = jags_dat_input$studyid_b), silent = TRUE)
+  try(points(jags_dat_input$time_b,
+             jags_dat_input$X_sf/jags_dat_input$Nb,
+         pch = jags_dat_input$studyid_b),
+      silent = TRUE)
   # text(jags_dat_input$time_b, jags_dat_input$X_sf/jags_dat_input$Nb,
   #      labels = jags_dat_input$studyid_b)
  

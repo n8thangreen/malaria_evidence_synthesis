@@ -1,5 +1,4 @@
 
-#
 # script for running stan
 #
 
@@ -11,6 +10,12 @@ library(shinystan)
 Na_data <- read.csv(here::here("data input", "N2_data.csv"), header = TRUE)
 Nb_data <- read.csv(here::here("data input", "N4_data.csv"), header = TRUE)
 
+# remove unpublished study
+Na_data <- Na_data[Na_data$study_id != 20, ]
+Na_data$study_id <- as.numeric(as.factor(Na_data$study_id))
+
+Nb_data <- Nb_data[Nb_data$study_id != 3, ]
+Nb_data$study_id <- as.numeric(as.factor(Nb_data$study_id))
 
 data_list <-
   list(N_groups = 4,
@@ -59,5 +64,5 @@ stan_base <- stan(
   iter = n_iter,
   chains = 1) # 1 chain testing; 4 chains proper
 
-launch_shinystan(stan_base)
+# launch_shinystan(stan_base)
 base <- extract(stan_base)   # iter x chain x parameter

@@ -18,17 +18,20 @@ library(purrr)
 # readin data
 data_a <- read.csv(here::here("data input", "N2_data.csv"), header = TRUE)
 
+# remove unpublished study
+data_a <- data_a[data_a$study_id != 20, ]
+data_a$study_id <- as.numeric(as.factor(data_a$study_id))
+
 # create input data
 jags_dat_input <- 
   list(
     len_b = nrow(data_a), #number of data points of type a
-    Nb = data_a$N_total, #total number of mosquitos in each trial type a
+    Nb = data_a$N_total, #total number of mosquito in each trial type a
     X_d = data_a$N_dead,
     X_f = data_a$N_fed,
     time_b = data_a$months_since_IRS,
     N_studies_b = length(unique(data_a$study_id)),
-    studyid_b = data_a$study_id
-  )
+    studyid_b = data_a$study_id)
 
 # monitored values
 params <-
@@ -37,8 +40,7 @@ params <-
     "mu_beta0d", "sigma_beta0d",
     "mu_beta1d", "sigma_beta1d",
     "pred_f", "pred_sf", "pred_d",
-    "predj_f", "predj_sf", "predj_d"
-  )
+    "predj_f", "predj_sf", "predj_d")
 
 
 # mcmc settings
@@ -59,13 +61,13 @@ n_thin <- 10
 out <- jags(jags_dat_input,
             # inits = list(inits(), inits()),
             parameters.to.save = params,
-            model.file = here::here("code", "BUGS_code_aggr_after.txt"),
+            model.file = here::here("BUGS", "BUGS_code_aggr_after.txt"),
             n.chains = 2,
             n.iter = n_iter,
             n.burnin = n_burnin,
             n.thin = n_thin,
             DIC = TRUE,
-            working.directory = here::here("code"),
+            working.directory = here::here(),
             progress.bar = "text")
 
 BUGSoutput <- out$BUGSoutput
