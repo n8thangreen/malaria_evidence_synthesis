@@ -66,3 +66,8 @@ stan_base <- stan(
 
 # launch_shinystan(stan_base)
 base <- extract(stan_base)   # iter x chain x parameter
+
+
+save(base,
+     file = here::here("data output", "stan_output.RData"))
+

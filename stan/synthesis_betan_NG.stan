@@ -1,3 +1,6 @@
+//
+//
+
 data {
   int<lower=1> N_groups; // Number of reponse categories
   

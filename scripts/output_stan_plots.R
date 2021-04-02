@@ -1,10 +1,11 @@
 
 # output stan plots
 #
-#
 
 
 ## prep
+
+load(here::here("data output", "stan_output.RData"))
 
 p_pred <- base$p_pred
 
@@ -56,7 +57,7 @@ polygon(x = c(1:tmax, tmax:1),
         col = transp("blue", 0.2), border = FALSE)
 
 plot(NULL, ylim = c(0, 1), xlim = c(1, tmax),
-     xlab = "Time in months", ylab = "Proportion of mosquitoes killed",
+     xlab = "Time in months", ylab = "Proportion of mosquitoes successfully fed",
      main = "", las = 1, xaxt = 'n')
 
 axis(1, at = seq(1, tmax, by = 1))
