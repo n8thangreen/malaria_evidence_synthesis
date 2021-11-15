@@ -75,5 +75,5 @@ BUGSoutput <- out$BUGSoutput
 folder_nm <- "BUGSoutput_aggr_before"
 dir.create(here::here("code", "data output", folder_nm), showWarnings = FALSE)
 
-save(BUGSoutput, file = here::here("code", "data output", folder_nm, "BUGSoutput.RData"))
-save(jags_dat_input, file = here::here("code", "data output", folder_nm, "jags_dat_input.RData"))
+save(BUGSoutput, file = here::here("data output", folder_nm, "BUGSoutput.RData"))
+save(jags_dat_input, file = here::here("data output", folder_nm, "jags_dat_input.RData"))

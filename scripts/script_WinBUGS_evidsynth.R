@@ -18,6 +18,11 @@ library(purrr)
 data_a <- read.csv(here::here("data input", "N2_data.csv"), header = TRUE)
 data_b <- read.csv(here::here("data input", "N4_data.csv"), header = TRUE)
 
+# remove trial
+data_a <-
+  dplyr::filter(data_a, study_id != 20) %>% 
+  dplyr::mutate(study_id = ifelse(study_id > 20, study_id - 1, study_id))
+
 jags_dat_input <- 
   list(
     # a
@@ -68,7 +73,7 @@ n_thin <- 10
 
 out <- jags(jags_dat_input,
             parameters.to.save = params,
-            model.file = here::here("BUGS_code_evidsynth.txt"),
+            model.file = here::here("BUGS/BUGS_code_evidsynth.txt"),
             n.chains = 2,
             n.iter = n_iter,
             n.burnin = n_burnin,

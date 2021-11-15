@@ -1,9 +1,11 @@
 
 # output stan plots
-#
+# probability over time line plots
 
 
-## prep
+########
+# prep #
+########
 
 load(here::here("data output", "stan_output.RData"))
 
@@ -33,7 +35,10 @@ summary_sf
 
 tmax <- 12
 
-## plot
+
+########
+# plot #
+########
 
 par(mfrow = c(1,2))
 

@@ -14,28 +14,34 @@ library(dplyr)
 # load data #
 #############
 
+BUGS_list <- list()
+
 folder_nm <- "BUGSoutput_aggr_before"
 load(here::here("data output", folder_nm, "BUGSoutput.RData")) 
 
 dat_aggb <- BUGSoutput$sims.matrix
 colnames(dat_aggb) <- paste0("aggb:", colnames(dat_aggb))
+BUGS_list$dat_aggb <- BUGSoutput
 
 folder_nm <- "BUGSoutput_aggr_after"
 load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 
 dat_agga <- BUGSoutput$sims.matrix
 colnames(dat_agga) <- paste0("agga:", colnames(dat_agga))
+BUGS_list$dat_agga <- BUGSoutput
 
 folder_nm <- "BUGSoutput_comp_only"
 load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 
 dat_comp <- BUGSoutput$sims.matrix
 colnames(dat_comp) <- paste0("comp:", colnames(dat_comp))
+BUGS_list$dat_comp <- BUGSoutput
 
 folder_nm <- "BUGSoutput_evidsynth"
 load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 
 dat_evidsynth <- BUGSoutput$sims.matrix
+BUGS_list$dat_evidsynth <- BUGSoutput
 
 
 #########
@@ -78,8 +84,9 @@ dat_tidy <-
   tidyr::separate(Var2, c("model", "Time"), "\\[") %>%
   tidyr::separate(model, c("data", "Outcome"), "_") %>%
   group_by(data, Outcome, Time) %>% 
-  summarise(value = quantile(value, c(0.25, 0.5, 0.75)), q = c(0.25, 0.5, 0.75)) %>% 
-  reshape2::dcast(data+Time+Outcome~q) %>% 
+  summarise(value = quantile(value, c(0.25, 0.5, 0.75)),
+            q = c(0.25, 0.5, 0.75)) %>% 
+  reshape2::dcast(data + Time + Outcome ~ q) %>% 
   mutate(Time = gsub("]", "", Time),
          Time = factor(Time, c("3","6","12")),
          Outcome = ifelse(Outcome == "d", "Dead", "Survived and fed")) %>% 
@@ -92,7 +99,8 @@ dat_tidy <-
 dat_tidy %>% 
   ggplot(aes(x = `0.5`, y = data, xmin= `0.25`, xmax = `0.75`, colour = `Time (months)`, shape = Outcome)) +
   geom_pointinterval(position = position_dodge(width = 0.3)) +
-  geom_point(position = position_dodge(width = 0.3), aes(x = `0.5`, y = data, colour = `Time (months)`, shape = Outcome), size = 3, inherit.aes = F) +
+  geom_point(position = position_dodge(width = 0.3),
+             aes(x = `0.5`, y = data, colour = `Time (months)`, shape = Outcome), size = 3, inherit.aes = FALSE) +
   scale_y_discrete("", 
                    labels = c("Aggregare after", "Aggregate before", "Comprehensive", "All")) +
   xlab("Posterior probability") +

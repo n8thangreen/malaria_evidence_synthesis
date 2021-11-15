@@ -29,17 +29,22 @@ IRS_BUGS_plot <- function(BUGSoutput,
   all_param_nm <- rownames(BUGSoutput$summary)
   N_studies <- jags_dat_input$N_studies_b
   
-  # extract summary statistics
+  ## extract summary statistics
+  # global
   summary_sf <- BUGSoutput$summary[grepl(pattern = "pred_sf", all_param_nm), ]
   summary_d <- BUGSoutput$summary[grepl(pattern = "pred_d", all_param_nm), ]
   
   summary_jd <- list()
   summary_jsf <- list()
   
+  # study specific
   for (i in seq_len(N_studies)) {
     
-    summary_jd[[i]] <- BUGSoutput$summary[grepl(pattern = paste0("predj_d\\[", i,","), all_param_nm), ]
-    summary_jsf[[i]] <- BUGSoutput$summary[grepl(pattern = paste0("predj_sf\\[", i,","), all_param_nm), ]
+    summary_jd[[i]] <-
+      BUGSoutput$summary[grepl(pattern = paste0("predj_d\\[", i,","), all_param_nm), ]
+    
+    summary_jsf[[i]] <-
+      BUGSoutput$summary[grepl(pattern = paste0("predj_sf\\[", i,","), all_param_nm), ]
   }
   
   # x11()
@@ -61,6 +66,7 @@ IRS_BUGS_plot <- function(BUGSoutput,
   # medians
   lines(summary_d[, "50%"], type = "l", col = "darkgrey", lwd = 2)
   
+  ##TODO: matplot?
   for (i in seq_len(N_studies)) {
     lines(summary_jd[[i]][, "50%"], type = "l", col = "darkgrey")
     # text(x = 12, y = summary_jd[[i]][,"50%"][12], labels = i)
@@ -74,11 +80,13 @@ IRS_BUGS_plot <- function(BUGSoutput,
   polygon(x = c(1:tmax, tmax:1),
           y = c(summary_d[,"2.5%"],
                 rev(summary_d[,"97.5%"])),
-          col = transp("blue",0.2), border = FALSE)
+          col = transp("blue", 0.2), border = FALSE)
   
   # raw data
-  try(points(jags_dat_input$time_b, jags_dat_input$X_d/jags_dat_input$Nb,
-         pch = jags_dat_input$studyid_b), silent = TRUE)
+  try(points(jags_dat_input$time_b,
+             jags_dat_input$X_d/jags_dat_input$Nb,
+         pch = jags_dat_input$studyid_b,
+         bg = "grey"), silent = TRUE)
   
   plot(NULL,
        ylim = c(0,1), xlim = c(1,tmax),
@@ -100,16 +108,17 @@ IRS_BUGS_plot <- function(BUGSoutput,
   polygon(x = c(1:tmax, tmax:1),
           y = c(summary_sf[,"25%"],
                 rev(summary_sf[,"75%"])),
-          col = transp("orange",0.2), border = FALSE)
+          col = transp("orange", 0.2), border = FALSE)
   polygon(x = c(1:tmax, tmax:1),
           y = c(summary_sf[,"2.5%"],
                 rev(summary_sf[,"97.5%"])),
-          col = transp("orange",0.2), border = FALSE)
+          col = transp("orange", 0.2), border = FALSE)
   
   # raw data
   try(points(jags_dat_input$time_b,
              jags_dat_input$X_sf/jags_dat_input$Nb,
-         pch = jags_dat_input$studyid_b),
+         pch = jags_dat_input$studyid_b,
+         bg = "grey"),
       silent = TRUE)
   # text(jags_dat_input$time_b, jags_dat_input$X_sf/jags_dat_input$Nb,
   #      labels = jags_dat_input$studyid_b)

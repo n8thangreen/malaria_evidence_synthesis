@@ -18,8 +18,11 @@ library(adegenet)
 library(shinystan)
 library(coda)
 
+source("R/IRS_BUGS_plot.R")
+
+
 folder_nm <- "BUGSoutput_aggr_before"
-load(here::here("data output", folder_nm, "BUGSoutput.RData")) 
+load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 load(here::here("data output", folder_nm, "jags_dat_input.RData"))
 
 IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/aggr_before")
@@ -43,5 +46,5 @@ folder_nm <- "BUGSoutput_evidsynth"
 load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 load(here::here("data output", folder_nm, "jags_dat_input.RData"))
 
-IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/evidsynth")
+IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/evidsynth", save = FALSE)
 
