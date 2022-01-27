@@ -23,6 +23,9 @@ data_a <-
   dplyr::filter(data_a, study_id != 20) %>% 
   dplyr::mutate(study_id = ifelse(study_id > 20, study_id - 1, study_id))
 
+data_b <- data_b[data_b$study_id != 3, ]
+data_b$study_id <- as.numeric(as.factor(data_b$study_id))
+
 jags_dat_input <- 
   list(
     # a

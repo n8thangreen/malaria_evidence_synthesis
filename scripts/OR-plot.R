@@ -2,7 +2,6 @@
 # OR plots
 #
 #
-#
 
 OR_rows <- grepl(pattern = "OR",
                  rownames(BUGSoutput$summary))

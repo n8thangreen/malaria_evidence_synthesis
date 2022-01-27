@@ -26,6 +26,7 @@ load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 load(here::here("data output", folder_nm, "jags_dat_input.RData"))
 
 IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/aggr_before")
+IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/aggr_before", save = FALSE)
 
 
 folder_nm <- "BUGSoutput_aggr_after"
@@ -33,6 +34,7 @@ load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 load(here::here("data output", folder_nm, "jags_dat_input.RData"))
 
 IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/aggr_after")
+IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/aggr_after", save = FALSE)
 
 
 folder_nm <- "BUGSoutput_comp_only"
@@ -40,11 +42,13 @@ load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 load(here::here("data output", folder_nm, "jags_dat_input.RData"))
 
 IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/comp_only")
+IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/comp_only", save = FALSE)
 
 
 folder_nm <- "BUGSoutput_evidsynth"
 load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 load(here::here("data output", folder_nm, "jags_dat_input.RData"))
 
+IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/evidsynth")
 IRS_BUGS_plot(BUGSoutput, jags_dat_input, file = "plots/evidsynth", save = FALSE)
 

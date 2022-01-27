@@ -43,6 +43,8 @@ load(here::here("data output", folder_nm, "BUGSoutput.RData"))
 dat_evidsynth <- BUGSoutput$sims.matrix
 BUGS_list$dat_evidsynth <- BUGSoutput
 
+save(BUGS_list, file = "data output/BUGS_list.RData")
+
 
 #########
 # plots #

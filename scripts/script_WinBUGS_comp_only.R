@@ -73,7 +73,7 @@ out <- jags(jags_dat_input,
 BUGSoutput <- out$BUGSoutput
 
 folder_nm <- "BUGSoutput_comp_only"
-dir.create(here::here("code", "data output", folder_nm), showWarnings = FALSE)
+dir.create(here::here("data output", folder_nm), showWarnings = FALSE)
 
-save(BUGSoutput, file = here::here("code", "data output", folder_nm, "BUGSoutput.RData"))
-save(jags_dat_input, file = here::here("code", "data output", folder_nm, "jags_dat_input.RData"))
+save(BUGSoutput, file = here::here("data output", folder_nm, "BUGSoutput.RData"))
+save(jags_dat_input, file = here::here("data output", folder_nm, "jags_dat_input.RData"))

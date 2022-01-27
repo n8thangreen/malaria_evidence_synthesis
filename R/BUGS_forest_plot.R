@@ -22,27 +22,30 @@ BUGS_forest_plot <- function(BUGS_list,
   
   dat$tidy <-
     dat$tidy %>%
-    mutate(Outcome = ifelse(Outcome == "pred_d", "Dead", "Survived Fed"))
+    mutate(Outcome = ifelse(Outcome == "pred_d", "Dead", "Survived Fed")) %>% 
+    rename(`Time (months)` = Time)
+  
+  dat$j <- rename(dat$j, `Time (months)` = Time)
   
   out <- 
     dat$tidy %>%
-    ggplot(aes(x = `50%`, y = data, xmin= `25%`, xmax = `75%`, colour = `Time`, shape = Outcome)) +
+    ggplot(aes(x = `50%`, y = data, xmin= `25%`, xmax = `75%`, colour = `Time (months)`, shape = Outcome)) +
     geom_point(data = dat$j,
                position = position_dodge(width = 0.3),
-               aes(x = `50%`, y = data, group = interaction(Outcome, Time)),
+               aes(x = `50%`, y = data, group = interaction(Outcome, `Time (months)`)),
                size = 1.5, colour = "lightgrey", inherit.aes = FALSE) +
     geom_pointinterval(position = position_dodge(width = 0.3)) +
     geom_point(position = position_dodge(width = 0.3),
-               aes(x = `50%`, y = data, colour = `Time`, shape = Outcome),
+               aes(x = `50%`, y = data, colour = `Time (months)`, shape = Outcome),
                size = 3, inherit.aes = FALSE) +
+    theme_bw() +
+    theme(axis.text = element_text(size = 15)) +
     xlab("Posterior probability") +
-    theme(axis.text = element_text(size = 12)) +
     scale_y_discrete("", 
-                     labels = c("Aggregate after", "Aggregate before", "Comprehensive", "All")) +
-    theme_bw()
+                     labels = c("Aggregate data only\n (Model 1)", "Aggregate data only\n (Model 2a)", "Comprehensive data only\n (Model 2b)", "All data\n (Model 3)"))
   
   if (save) {
-    ggsave(filename = "forest_plot.png")
+    ggsave(filename = "forest_plot.png", dpi = 640, height = 8, width = 8)
   }
   
   out
