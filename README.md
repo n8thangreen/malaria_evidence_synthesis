@@ -3,6 +3,17 @@
 
 # An evidence synthesis approach for combining different data sources on entomological efficacy of insecticides for indoor residual spraying
 
+| :loudspeaker: Now published |
+|-----------------------------|
+
+> \[!IMPORTANT\] [Green, N., Agossa, F., Yovogan, B., Oxborough, R.,
+> Kitau, J., Müller, P., Constant, E., Rowland, M., Tchacaya, E.F.,
+> Benjamin, K.G. and Churcher, T.S., 2022. An evidence synthesis
+> approach for combining different data sources illustrated using
+> entomological efficacy of insecticides for indoor residual spraying.
+> PloS one, 17(3),
+> p.e0263446.](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0263446)
+
 #### Background
 
 Malaria public health interventions are tested for entomological impact
@@ -25,7 +36,7 @@ benefits and limitations of each.
 #### Results
 
 Many more data are available in aggregated format (N = 23 datasets)
-relative to comprehensive format (N = 3 datasets). The evidence
+relative to comprehensive format ($N$ = 3 datasets). The evidence
 synthesis model was able to predict the probability of mosquitoes dying
 or surviving and blood-feeding most robustly. Generating odds ratios
 from the correlated Bernoulli random sample indicates that when
