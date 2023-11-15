@@ -6,7 +6,8 @@
 | :loudspeaker: Now published |
 |-----------------------------|
 
-> \[!IMPORTANT\] [Green, N., Agossa, F., Yovogan, B., Oxborough, R.,
+> [!IMPORTANT]
+> [Green, N., Agossa, F., Yovogan, B., Oxborough, R.,
 > Kitau, J., Müller, P., Constant, E., Rowland, M., Tchacaya, E.F.,
 > Benjamin, K.G. and Churcher, T.S., 2022. An evidence synthesis
 > approach for combining different data sources illustrated using
