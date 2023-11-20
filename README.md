@@ -9,7 +9,7 @@
 > [!IMPORTANT]
 > [Green, N., Agossa, F., Yovogan, B., Oxborough, R.,
 > Kitau, J., Müller, P., Constant, E., Rowland, M., Tchacaya, E.F.,
-> Benjamin, K.G. and Churcher, T.S., 2022. An evidence synthesis
+> Benjamin, K.G. and Churcher, T.S., Michael Betancourt,Ellie Sherrard-Smith 2022. An evidence synthesis
 > approach for combining different data sources illustrated using
 > entomological efficacy of insecticides for indoor residual spraying.
 > PloS one, 17(3),
